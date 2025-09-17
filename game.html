@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeLearn - Disaster Preparedness for Schools & Colleges</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* Disaster Decisions Game Styles */
+        .game-container {
+            min-height: 600px;
+            transition: all 0.3s ease;
+        }
+
+        .game-screen {
+            min-height: 500px;
+        }
+
+        .disaster-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .disaster-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            text-align: left;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .option-btn:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .option-btn.selected {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .option-btn.correct {
+            border-color: #28a745;
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .option-btn.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .feedback-container {
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Disaster-specific animations */
+        .earthquake-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .fire-animation {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fire-animation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 193, 7, 0.1) 50%, transparent 70%);
+            animation: smoke 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes smoke {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .flood-animation {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flood-animation::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0;
+            background: linear-gradient(to top, rgba(0, 123, 255, 0.2), transparent);
+            animation: risingWater 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes risingWater {
+            0% { height: 0; }
+            50% { height: 30%; }
+            100% { height: 0; }
+        }
+
+        .cyclone-animation {
+            animation: sway 1s ease-in-out infinite;
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(1deg); }
+            75% { transform: rotate(-1deg); }
+        }
+
+        .progress-bar {
+            transition: width 1s ease;
+        }
+
+        .results-icon {
+            animation: bounce 1s ease;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 1rem !important;
+            }
+            
+            .option-btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .disaster-card .card-body {
+                padding: 1.5rem !important;
+            }
+            
+            .game-navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .game-navigation .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+     <!-- Disaster Decisions Game Section -->
+     <section id="disaster-decisions" class="py-5 bg-gradient-primary">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-4 fw-bold mb-4 text-white">
+                    Disaster Decisions
+                </h2>
+                <p class="lead text-white-50 mx-auto" style="max-width: 800px;">
+                    Test your disaster preparedness knowledge with our interactive decision-based scenarios. Make the right choices to survive and learn!
+                </p>
+            </div>
+
+            <!-- Game Container -->
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="game-container bg-white rounded-4 shadow-lg p-4">
+                        
+                        <!-- Disaster Selection Menu -->
+                        <div id="disaster-menu" class="game-screen">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold text-primary mb-3">Choose Your Disaster Scenario</h3>
+                                <p class="text-muted">Select a disaster type to begin your preparedness journey</p>
+                            </div>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="disaster-card card h-100 border-0 shadow-sm cursor-pointer" data-disaster="earthquake">
+                                        <div class="card-body text-center p-4">
+                                            <div class="disaster-icon mb-3">
+                                                <i class="fas fa-mountain text-danger" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <h5 class="card-title fw-bold text-danger">EARTHQUAKE</h5>
+                                            <p class="card-text text-muted small">Test your earthquake safety knowledge</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="disaster-card card h-100 border-0 shadow-sm cursor-pointer" data-disaster="fire">
+                                        <div class="card-body text-center p-4">
+                                            <div class="disaster-icon mb-3">
+                                                <i class="fas fa-fire text-warning" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <h5 class="card-title fw-bold text-warning">FIRE</h5>
+                                            <p class="card-text text-muted small">Learn fire safety protocols</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="disaster-card card h-100 border-0 shadow-sm cursor-pointer" data-disaster="flood">
+                                        <div class="card-body text-center p-4">
+                                            <div class="disaster-icon mb-3">
+                                                <i class="fas fa-water text-info" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <h5 class="card-title fw-bold text-info">FLOOD</h5>
+                                            <p class="card-text text-muted small">Master flood survival skills</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="disaster-card card h-100 border-0 shadow-sm cursor-pointer" data-disaster="cyclone">
+                                        <div class="card-body text-center p-4">
+                                            <div class="disaster-icon mb-3">
+                                                <i class="fas fa-wind text-success" style="font-size: 2.5rem;"></i>
+                                            </div>
+                                            <h5 class="card-title fw-bold text-success">CYCLONE</h5>
+                                            <p class="card-text text-muted small">Navigate cyclone emergencies</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Game Screen -->
+                        <div id="game-screen" class="game-screen d-none">
+                            <!-- Game Header -->
+                            <div class="game-header d-flex justify-content-between align-items-center mb-4 p-3 bg-light rounded-3">
+                                <div>
+                                    <h4 class="mb-1 fw-bold text-primary" id="current-disaster-title">Earthquake Scenario</h4>
+                                    <small class="text-muted" id="question-counter">Question 1 of 4</small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="score-display">
+                                        <span class="badge bg-success fs-6" id="current-score">Score: 0</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Question Container -->
+                            <div class="question-container mb-4">
+                                <div class="question-card card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="question-text fw-bold mb-4" id="question-text">
+                                            You feel strong tremors in your classroom. What should you do?
+                                        </h5>
+                                        
+                                        <div class="options-container" id="options-container">
+                                            <!-- Options will be dynamically generated -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Feedback Container -->
+                            <div id="feedback-container" class="feedback-container mb-4 d-none">
+                                <div class="alert" id="feedback-alert" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <span id="feedback-icon" class="me-3 fs-3">✅</span>
+                                        <div>
+                                            <h6 class="alert-heading mb-1" id="feedback-title">Correct!</h6>
+                                            <p class="mb-0" id="feedback-explanation">
+                                                Hiding under the desk prevents injuries from falling debris.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Navigation Buttons -->
+                            <div class="game-navigation d-flex justify-content-between">
+                                <button id="back-to-menu" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Menu
+                                </button>
+                                <button id="next-question" class="btn btn-primary d-none">
+                                    Next Question <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                                <button id="finish-game" class="btn btn-success d-none">
+                                    Finish Scenario <i class="fas fa-check ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Results Screen -->
+                        <div id="results-screen" class="game-screen d-none">
+                            <div class="text-center">
+                                <div class="results-icon mb-4">
+                                    <i class="fas fa-trophy text-warning" style="font-size: 4rem;"></i>
+                                </div>
+                                
+                                <h3 class="fw-bold text-primary mb-3">Scenario Complete!</h3>
+                                
+                                <div class="score-summary mb-4">
+                                    <div class="row justify-content-center">
+                                        <div class="col-md-6">
+                                            <div class="card border-0 shadow-sm">
+                                                <div class="card-body p-4">
+                                                    <h4 class="fw-bold mb-3" id="final-score">Score: 3/4</h4>
+                                                    <div class="progress mb-3" style="height: 20px;">
+                                                        <div class="progress-bar bg-success" id="preparedness-progress" style="width: 75%"></div>
+                                                    </div>
+                                                    <h5 class="fw-bold text-success" id="preparedness-percentage">75% Prepared</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="motivational-message mb-4">
+                                    <div class="alert alert-success border-0 shadow-sm">
+                                        <h5 class="alert-heading mb-2" id="motivational-title">Well Done!</h5>
+                                        <p class="mb-0" id="motivational-text">
+                                            You survived the earthquake scenario with 3/4 correct decisions. Keep learning to improve your preparedness!
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="results-actions">
+                                    <button id="play-again" class="btn btn-primary me-3">
+                                        <i class="fas fa-redo me-2"></i>Play Again
+                                    </button>
+                                    <button id="choose-another" class="btn btn-outline-primary">
+                                        <i class="fas fa-list me-2"></i>Choose Another Disaster
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <script>
+        // Disaster Decisions Game Logic
+        const disasters = {
+            earthquake: [
+                {
+                    question: "You feel strong tremors in your classroom. What should you do?",
+                    options: [
+                        "Run to the staircase immediately",
+                        "Hide under the desk",
+                        "Use the lift",
+                        "Stay near windows"
+                    ],
+                    correct: 1,
+                    explanation: "Correct! Hiding under the desk prevents injuries from falling debris. Running during tremors can cause falls and injuries."
+                },
+                {
+                    question: "The tremors stop. What is your next step?",
+                    options: [
+                        "Rush out in panic",
+                        "Move calmly to the open ground",
+                        "Stay inside",
+                        "Take the lift to exit"
+                    ],
+                    correct: 1,
+                    explanation: "Moving calmly to an open ground ensures safety from aftershocks. Never use lifts during or after earthquakes."
+                },
+                {
+                    question: "You're outside when aftershocks occur. What should you do?",
+                    options: [
+                        "Run back inside the building",
+                        "Stay in the open area away from buildings",
+                        "Stand near tall trees",
+                        "Go to the parking lot"
+                    ],
+                    correct: 1,
+                    explanation: "Stay in open areas away from buildings, trees, and power lines to avoid falling debris during aftershocks."
+                },
+                {
+                    question: "Someone is trapped under debris. What should you do?",
+                    options: [
+                        "Try to move the debris yourself",
+                        "Call emergency services and wait for help",
+                        "Ignore and move on",
+                        "Use heavy machinery nearby"
+                    ],
+                    correct: 1,
+                    explanation: "Call emergency services immediately. Moving debris without proper equipment can cause further injury to the trapped person."
+                }
+            ],
+            fire: [
+                {
+                    question: "Smoke fills the computer lab. What should you do?",
+                    options: [
+                        "Break windows and jump out",
+                        "Crawl low and cover your mouth",
+                        "Use the lift",
+                        "Hide under the table"
+                    ],
+                    correct: 1,
+                    explanation: "Smoke rises, so staying low reduces inhalation. Lifts should never be used during fire emergencies."
+                },
+                {
+                    question: "You see a small fire in the chemistry lab. What's your first action?",
+                    options: [
+                        "Try to put it out with water",
+                        "Pull the fire alarm and evacuate",
+                        "Ignore it if it's small",
+                        "Use a fire extinguisher immediately"
+                    ],
+                    correct: 1,
+                    explanation: "Always pull the fire alarm first to alert everyone, then evacuate. Let trained professionals handle the fire."
+                },
+                {
+                    question: "The fire alarm sounds. What should you do?",
+                    options: [
+                        "Finish your work first",
+                        "Evacuate immediately using stairs",
+                        "Wait for instructions",
+                        "Use the nearest exit"
+                    ],
+                    correct: 1,
+                    explanation: "Evacuate immediately using stairs when the fire alarm sounds. Every second counts in a fire emergency."
+                },
+                {
+                    question: "You're trapped in a room with fire outside. What should you do?",
+                    options: [
+                        "Open the door and run through the fire",
+                        "Block door gaps with wet cloth and call for help",
+                        "Jump out the window",
+                        "Hide in a closet"
+                    ],
+                    correct: 1,
+                    explanation: "Block door gaps to prevent smoke entry and call for help. This gives you the best chance of survival."
+                }
+            ],
+            flood: [
+                {
+                    question: "Heavy rain causes water to enter your classroom. What should you do?",
+                    options: [
+                        "Stay and wait for it to stop",
+                        "Move to higher ground immediately",
+                        "Try to block the water",
+                        "Continue with your studies"
+                    ],
+                    correct: 1,
+                    explanation: "Move to higher ground immediately. Flood waters can rise quickly and become dangerous."
+                },
+                {
+                    question: "You're walking through flood water. What should you do?",
+                    options: [
+                        "Walk normally through the water",
+                        "Use a stick to check depth and avoid electrical hazards",
+                        "Run through quickly",
+                        "Walk barefoot to feel the ground"
+                    ],
+                    correct: 1,
+                    explanation: "Use a stick to check depth and avoid electrical hazards. Flood water can hide dangerous objects and electrical currents."
+                },
+                {
+                    question: "Your vehicle stalls in flood water. What should you do?",
+                    options: [
+                        "Stay in the vehicle and wait",
+                        "Get out and move to higher ground",
+                        "Try to restart the engine",
+                        "Call for help and stay put"
+                    ],
+                    correct: 1,
+                    explanation: "Get out immediately and move to higher ground. Vehicles can be swept away by flood waters."
+                },
+                {
+                    question: "You see someone drowning in flood water. What should you do?",
+                    options: [
+                        "Jump in to save them",
+                        "Throw a rope or floatable object",
+                        "Call for help and stay safe",
+                        "Both B and C"
+                    ],
+                    correct: 3,
+                    explanation: "Call for help and throw a rope or floatable object. Never jump into flood water as it can be dangerous for both of you."
+                }
+            ],
+            cyclone: [
+                {
+                    question: "A cyclone warning is issued for your area. What should you do?",
+                    options: [
+                        "Continue with normal activities",
+                        "Stay indoors and away from windows",
+                        "Go outside to see the cyclone",
+                        "Drive to a different city"
+                    ],
+                    correct: 1,
+                    explanation: "Stay indoors and away from windows. Cyclones can cause flying debris and strong winds."
+                },
+                {
+                    question: "You're outside when the cyclone approaches. What should you do?",
+                    options: [
+                        "Run to the nearest building",
+                        "Find a low-lying area and lie flat",
+                        "Stand under a tree",
+                        "Try to outrun the cyclone"
+                    ],
+                    correct: 1,
+                    explanation: "Find a low-lying area and lie flat to avoid flying debris. Never stand under trees during cyclones."
+                },
+                {
+                    question: "The cyclone is passing over your area. What should you do?",
+                    options: [
+                        "Go outside to check damage",
+                        "Stay in the strongest part of the building",
+                        "Open windows to equalize pressure",
+                        "Use electronic devices"
+                    ],
+                    correct: 1,
+                    explanation: "Stay in the strongest part of the building (like a basement or interior room) until the cyclone passes completely."
+                },
+                {
+                    question: "After the cyclone passes, what should you do?",
+                    options: [
+                        "Immediately go outside to assess damage",
+                        "Wait for official all-clear signal",
+                        "Start cleaning up debris",
+                        "Call friends to check on them"
+                    ],
+                    correct: 1,
+                    explanation: "Wait for official all-clear signal before going outside. There may be aftershocks or additional dangers."
+                }
+            ]
+        };
+
+        // Game state
+        let currentDisaster = null;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        // DOM elements
+        const disasterMenu = document.getElementById('disaster-menu');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const currentDisasterTitle = document.getElementById('current-disaster-title');
+        const questionCounter = document.getElementById('question-counter');
+        const currentScore = document.getElementById('current-score');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackExplanation = document.getElementById('feedback-explanation');
+        const feedbackAlert = document.getElementById('feedback-alert');
+        const nextQuestionBtn = document.getElementById('next-question');
+        const finishGameBtn = document.getElementById('finish-game');
+        const finalScore = document.getElementById('final-score');
+        const preparednessProgress = document.getElementById('preparedness-progress');
+        const preparednessPercentage = document.getElementById('preparedness-percentage');
+        const motivationalTitle = document.getElementById('motivational-title');
+        const motivationalText = document.getElementById('motivational-text');
+
+        // Initialize game
+        function initGame() {
+            // Add event listeners for disaster cards
+            document.querySelectorAll('.disaster-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const disaster = card.dataset.disaster;
+                    startDisasterScenario(disaster);
+                });
+            });
+
+            // Add event listeners for navigation buttons
+            document.getElementById('back-to-menu').addEventListener('click', showDisasterMenu);
+            document.getElementById('next-question').addEventListener('click', nextQuestion);
+            document.getElementById('finish-game').addEventListener('click', showResults);
+            document.getElementById('play-again').addEventListener('click', () => {
+                startDisasterScenario(currentDisaster);
+            });
+            document.getElementById('choose-another').addEventListener('click', showDisasterMenu);
+        }
+
+        // Start disaster scenario
+        function startDisasterScenario(disaster) {
+            currentDisaster = disaster;
+            currentQuestionIndex = 0;
+            score = 0;
+            selectedOption = null;
+
+            // Update UI
+            currentDisasterTitle.textContent = `${disaster.charAt(0).toUpperCase() + disaster.slice(1)} Scenario`;
+            currentScore.textContent = `Score: ${score}`;
+
+            // Show game screen
+            showGameScreen();
+            
+            // Load first question
+            loadQuestion();
+        }
+
+        // Show disaster menu
+        function showDisasterMenu() {
+            disasterMenu.classList.remove('d-none');
+            gameScreen.classList.add('d-none');
+            resultsScreen.classList.add('d-none');
+        }
+
+        // Show game screen
+        function showGameScreen() {
+            disasterMenu.classList.add('d-none');
+            gameScreen.classList.remove('d-none');
+            resultsScreen.classList.add('d-none');
+        }
+
+        // Show results screen
+        function showResults() {
+            disasterMenu.classList.add('d-none');
+            gameScreen.classList.add('d-none');
+            resultsScreen.classList.remove('d-none');
+
+            // Calculate results
+            const totalQuestions = disasters[currentDisaster].length;
+            const percentage = Math.round((score / totalQuestions) * 100);
+            
+            // Update results
+            finalScore.textContent = `Score: ${score}/${totalQuestions}`;
+            preparednessProgress.style.width = `${percentage}%`;
+            preparednessPercentage.textContent = `${percentage}% Prepared`;
+
+            // Motivational messages
+            const messages = {
+                earthquake: [
+                    "Earthquake Ready!",
+                    "You survived the earthquake scenario with " + score + "/" + totalQuestions + " correct decisions. Keep learning to improve your preparedness!"
+                ],
+                fire: [
+                    "Fire Safety Master!",
+                    "You handled the fire emergency with " + score + "/" + totalQuestions + " correct decisions. Your fire safety knowledge is growing!"
+                ],
+                flood: [
+                    "Flood Survival Expert!",
+                    "You navigated the flood scenario with " + score + "/" + totalQuestions + " correct decisions. Stay prepared for water emergencies!"
+                ],
+                cyclone: [
+                    "Cyclone Warrior!",
+                    "You weathered the cyclone scenario with " + score + "/" + totalQuestions + " correct decisions. Your storm preparedness is strong!"
+                ]
+            };
+
+            motivationalTitle.textContent = messages[currentDisaster][0];
+            motivationalText.textContent = messages[currentDisaster][1];
+        }
+
+        // Load question
+        function loadQuestion() {
+            const questions = disasters[currentDisaster];
+            const question = questions[currentQuestionIndex];
+            
+            // Update question counter
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            
+            // Update question text
+            questionText.textContent = question.question;
+            
+            // Clear options
+            optionsContainer.innerHTML = '';
+            
+            // Add options
+            question.options.forEach((option, index) => {
+                const optionBtn = document.createElement('button');
+                optionBtn.className = 'option-btn';
+                optionBtn.textContent = option;
+                optionBtn.dataset.index = index;
+                
+                optionBtn.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(optionBtn);
+            });
+            
+            // Hide feedback and navigation buttons
+            feedbackContainer.classList.add('d-none');
+            nextQuestionBtn.classList.add('d-none');
+            finishGameBtn.classList.add('d-none');
+        }
+
+        // Select option
+        function selectOption(optionIndex) {
+            if (selectedOption !== null) return; // Prevent multiple selections
+            
+            selectedOption = optionIndex;
+            const questions = disasters[currentDisaster];
+            const question = questions[currentQuestionIndex];
+            const isCorrect = optionIndex === question.correct;
+            
+            // Update score
+            if (isCorrect) {
+                score++;
+                currentScore.textContent = `Score: ${score}`;
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect, question.explanation, optionIndex);
+            
+            // Add disaster-specific animation
+            addDisasterAnimation();
+        }
+
+        // Show feedback
+        function showFeedback(isCorrect, explanation, selectedIndex) {
+            // Update feedback content
+            feedbackIcon.textContent = isCorrect ? '✅' : '❌';
+            feedbackTitle.textContent = isCorrect ? 'Correct!' : 'Incorrect!';
+            feedbackExplanation.textContent = explanation;
+            
+            // Update alert class
+            feedbackAlert.className = `alert ${isCorrect ? 'alert-success' : 'alert-danger'} border-0 shadow-sm`;
+            
+            // Show feedback
+            feedbackContainer.classList.remove('d-none');
+            
+            // Update option buttons
+            const optionBtns = document.querySelectorAll('.option-btn');
+            optionBtns.forEach((btn, index) => {
+                btn.disabled = true;
+                if (index === selectedIndex) {
+                    btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+                } else if (index === disasters[currentDisaster][currentQuestionIndex].correct) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            // Show navigation button
+            const questions = disasters[currentDisaster];
+            if (currentQuestionIndex < questions.length - 1) {
+                nextQuestionBtn.classList.remove('d-none');
+            } else {
+                finishGameBtn.classList.remove('d-none');
+            }
+        }
+
+        // Next question
+        function nextQuestion() {
+            currentQuestionIndex++;
+            selectedOption = null;
+            loadQuestion();
+        }
+
+        // Add disaster-specific animation
+        function addDisasterAnimation() {
+            const gameContainer = document.querySelector('.game-container');
+            gameContainer.classList.remove('earthquake-animation', 'fire-animation', 'flood-animation', 'cyclone-animation');
+            
+            setTimeout(() => {
+                gameContainer.classList.add(`${currentDisaster}-animation`);
+            }, 100);
+        }
+
+        // Initialize game when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+    
+</body>
+</html>
