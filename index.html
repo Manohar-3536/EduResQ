@@ -33,6 +33,7 @@
             line-height: 1.6;
             color: #333;
             overflow-x: hidden;
+
         }
 
         /* Custom Colors */
@@ -112,9 +113,11 @@
     align-items: center;
     width: max-content;
     padding: 1rem;
-    animation: scrollX 60s linear infinite;
+    animation: scrollX 50s linear infinite;
 }
-
+.strip-track:hover {
+  animation-play-state: paused;
+}
 .strip-item {
     flex: 0 0 auto;
     width: 240px;
@@ -723,7 +726,7 @@
                     </p>
 
                     <div class="d-flex flex-column flex-sm-row gap-3">
-                        <button class="btn btn-primary btn-lg px-4 py-3" onclick="window.location.href='game.html'">
+                        <button class="btn btn-primary btn-lg px-4 py-3" onclick="window.location.href='login.html'">
                             <i class="bi bi-controller me-2"></i>
                             Start Learning (Games & Quizzes)
                         </button>                        
@@ -731,26 +734,25 @@
                 </div>
             </div>
 
-            <!-- hero media: infinite strip -->
+<!-- hero media: infinite strip -->
 <div class="col-lg-6">
   <div class="hero-media">
     <div class="infinite-strip">
       <div class="strip-track">
-  <div class="strip-item"><img src="images/flood1.jpg" alt="Earthquake"></div>
-        
+        <div class="strip-item"><img src="images/flood1.jpg" alt="Earthquake"></div>
         <div class="strip-item"><img src="images/cyclone1.jpg" alt="Flood"></div>
-        
         <div class="strip-item"><img src="images/tsunami1.jpg" alt="Tsunami"></div>
         <div class="strip-item"><img src="images/earthquake1.jpg" alt="Cyclone"></div>
-    
+
+        <div class="strip-item"><img src="images/flood1.jpg" alt="Earthquake"></div>
+        <div class="strip-item"><img src="images/cyclone1.jpg" alt="Flood"></div>
+        <div class="strip-item"><img src="images/tsunami1.jpg" alt="Tsunami"></div>
+        <div class="strip-item"><img src="images/earthquake1.jpg" alt="Cyclone"></div>
       </div>
     </div>
   </div>
 </div>
 
-
-        </div>
-    </div>
 </section>
 
 
@@ -901,7 +903,7 @@
 
 
     <!-- Interactive Map Section -->
-    <section id="disaster-map" class="py-5 bg-light">
+    <section id="disaster-map" class="py-5 bg-light" >
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="display-4 fw-bold mb-4">
