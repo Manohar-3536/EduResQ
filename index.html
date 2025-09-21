@@ -51,6 +51,112 @@
             scroll-behavior: smooth;
         }
 
+        /* Iframe Styling */
+        iframe {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        iframe:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Iframe Container Styling */
+        .iframe-container {
+            position: relative;
+            display: inline-block;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e8f5e8 100%);
+            padding: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .iframe-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Iframe Loading State */
+        .iframe-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .iframe-container.loading::before {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Responsive Iframe Styling */
+        @media (max-width: 768px) {
+            iframe {
+                width: 100% !important;
+                height: 200px !important;
+                max-width: 100%;
+            }
+            
+            .iframe-container {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            iframe {
+                height: 180px !important;
+            }
+        }
+
+        /* Iframe Title Styling */
+        .iframe-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Enhanced iframe wrapper for better integration */
+        .video-wrapper {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .video-wrapper:hover {
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
         /* Navigation */
         .navbar {
             transition: all 0.3s ease;
@@ -721,7 +827,7 @@
                         Interactive Disaster Preparedness for Schools & Colleges
                     </p>
                     <p class="fs-5 text-secondary mb-5">
-                        Empower students with gamified learning, interactive tutorials, and real-time guidance to
+                        Empower students with gamified learning, and  interactive tutorials to
                         build disaster resilience across India.
                     </p>
 
@@ -842,8 +948,13 @@
     <li>If outside, move to an open area.</li>
   </ul>
   <div class="text-center mt-4">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/MKILThtPxQs"
-      title="Earthquake Video" frameborder="0" allowfullscreen></iframe>
+    <div class="video-wrapper">
+      <h3 class="iframe-title">📹 Earthquake Safety Video</h3>
+      <div class="iframe-container">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/MKILThtPxQs"
+          title="Earthquake Video" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
   </div>
   <div class="text-center mt-4">
     <button onclick="showHome()" class="btn btn-primary">⬅ Back to Home</button>
@@ -859,8 +970,13 @@
     <li>Keep emergency supplies and clean drinking water ready.</li>
   </ul>
   <div class="text-center mt-4">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/dThf_YvBufc"
-      title="Floods Video" frameborder="0" allowfullscreen></iframe>
+    <div class="video-wrapper">
+      <h3 class="iframe-title">🌊 Flood Safety Video</h3>
+      <div class="iframe-container">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/dThf_YvBufc"
+          title="Floods Video" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
   </div>
   <div class="text-center mt-4">
     <button onclick="showHome()" class="btn btn-primary">⬅ Back to Home</button>
@@ -876,8 +992,13 @@
     <li>Listen to disaster management alerts.</li>
   </ul>
   <div class="text-center mt-4">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/RTgiQTCPZqQ"
-      title="Tsunami Video" frameborder="0" allowfullscreen></iframe>
+    <div class="video-wrapper">
+      <h3 class="iframe-title">🌊 Tsunami Safety Video</h3>
+      <div class="iframe-container">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/RTgiQTCPZqQ"
+          title="Tsunami Video" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
   </div>
   <div class="text-center mt-4">
     <button onclick="showHome()" class="btn btn-primary">⬅ Back to Home</button>
@@ -893,8 +1014,13 @@
     <li>Evacuate low-lying areas if advised.</li>
   </ul>
   <div class="text-center mt-4">
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/Li1ysRexTY8"
-      title="Cyclone Video" frameborder="0" allowfullscreen></iframe>
+    <div class="video-wrapper">
+      <h3 class="iframe-title">🌀 Cyclone Safety Video</h3>
+      <div class="iframe-container">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/Li1ysRexTY8"
+          title="Cyclone Video" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
   </div>
   <div class="text-center mt-4">
     <button onclick="showHome()" class="btn btn-primary">⬅ Back to Home</button>
@@ -1218,6 +1344,12 @@
   function showHome() {
     document.querySelectorAll("[id$='-page']").forEach(page => page.style.display = "none");
     document.getElementById("features").style.display = "block";
+
+    document.querySelectorAll("iframe").forEach(iframe => {
+        const src = iframe.src;
+        iframe.src = src; // resetting src stops the video
+    });
+
   }
 
         // Interactive Map Functionality
@@ -1283,19 +1415,35 @@
         }
         //Map hover colour changing
         function addHoverEffect(className, color) {
-            const shapes = document.getElementsByClassName(className);
-            for (let i = 0; i < shapes.length; i++) {
-                const shape = shapes[i];
-                const original = shape.getAttribute("fill");
-            shape.addEventListener("mouseenter", () => {
-                shape.setAttribute("fill",color);
-            });
+    const shapes = document.getElementsByClassName(className);
+    for (let i = 0; i < shapes.length; i++) {
+        const shape = shapes[i];
+        const originalFill = shape.getAttribute("fill");
 
-            shape.addEventListener("mouseleave", () => {
-                shape.setAttribute("fill",original);
-            });
-            } 
-        }
+        shape.style.transformOrigin = "center center";
+        shape.style.transformBox = "fill-box"; // ensures proper origin
+        shape.style.transition = "transform 0.2s ease, fill 0.2s ease";
+
+        shape.addEventListener("mouseenter", () => {
+            shape.setAttribute("fill", color);
+            shape.style.transform = "scale(1.13)";
+            shape.style.zIndex = "1000";
+            <!-- shape.setAttribute("stroke","rgba(0, 0, 0, 1)"); -->
+            
+            // Move to end of parent to bring it to front
+            shape.parentNode.appendChild(shape);
+        });
+        
+        shape.addEventListener("mouseleave", () => {
+            shape.setAttribute("fill", originalFill);
+            <!-- shape.setAttribute("stroke","rgba(255, 255, 255, 1)"); -->
+            shape.style.transform = "scale(1)";
+        });
+    }
+}
+
+        
+        
             addHoverEffect("earthquake","rgba(220,53,69,1)")
             addHoverEffect("cyclone","rgba(255,165,0,1)")
             addHoverEffect("tsunami","rgba(128,0,128,1)")
@@ -1508,10 +1656,10 @@
         console.log('%cBuilt for educational institutions across India', 'color: #6c757d; font-size: 12px;');
 
         // Chatbot Logic (Gemini API)
-        const CHATBOT_API_KEY = "AIzaSyALbGfg_TTnMigARcTqiQafs15aakjLmNE";
+        const CHATBOT_API_KEY = "AIzaSyB4oSYdYmWuR90MCbLQHcPtVbNkCPFFCWs";
         async function getGeminiResponse(prompt) {
             try {
-                const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + CHATBOT_API_KEY, {
+                const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + CHATBOT_API_KEY, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -1574,6 +1722,47 @@
             });
         })();
 
+        // Enhanced iframe functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add loading states to iframes
+            const iframes = document.querySelectorAll('iframe');
+            
+            iframes.forEach(iframe => {
+                const container = iframe.closest('.iframe-container');
+                
+                // Add loading class initially
+                if (container) {
+                    container.classList.add('loading');
+                }
+                
+                // Remove loading class when iframe loads
+                iframe.addEventListener('load', function() {
+                    if (container) {
+                        container.classList.remove('loading');
+                    }
+                });
+                
+                // Add click-to-play enhancement
+                iframe.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+            
+            // Smooth scroll to videos when navigating
+            const videoWrappers = document.querySelectorAll('.video-wrapper');
+            videoWrappers.forEach(wrapper => {
+                wrapper.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                
+                wrapper.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
 
     </script>
 </body>
