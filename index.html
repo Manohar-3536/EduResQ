@@ -1656,7 +1656,7 @@
         console.log('%cBuilt for educational institutions across India', 'color: #6c757d; font-size: 12px;');
 
         // Chatbot Logic (Gemini API)
-        const CHATBOT_API_KEY = "AIzaSyB4oSYdYmWuR90MCbLQHcPtVbNkCPFFCWs";
+        const CHATBOT_API_KEY = "YOUR_API_KEY";
         async function getGeminiResponse(prompt) {
             try {
                 const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + CHATBOT_API_KEY, {
