@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disaster Learning Hub</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background:linear-gradient(135deg, #e3f2fd 0%, #e8f5e8 100%);;
+      color: #333;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                  url("https://images.unsplash.com/photo-1508780709619-79562169bc64?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+      color: white;
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .hero h1 {
+      font-size: 46px;
+      margin-bottom: 15px;
+    }
+    .hero p {
+      font-size: 20px;
+      opacity: 0.9;
+    }
+
+    /* Section Heading */
+    .section-title {
+      text-align: center;
+      font-size: 24px;
+      margin: 40px 0 10px;
+      color: #444;
+    }
+
+    /* Container for Cards */
+    .container {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px 20px 60px;
+      flex-wrap: wrap;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      padding: 30px 20px;
+      width: 280px;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+    }
+    .card img {
+      width: 60px;
+      margin-bottom: 15px;
+    }
+    .card h2 {
+      margin: 10px 0;
+      font-size: 22px;
+    }
+    .card p {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .btn-game {
+      background: linear-gradient(135deg, #2a9d8f, #21867a);
+    }
+    .btn-game:hover {
+      background: linear-gradient(135deg, #21867a, #17685d);
+    }
+    .btn-quiz {
+      background: linear-gradient(135deg, #e76f51, #c85c44);
+    }
+    .btn-quiz:hover {
+      background: linear-gradient(135deg, #c85c44, #a24b36);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+      color: #adb5bd;
+      /* background: #263238; */
+      background: linear-gradient(135deg, #212529, #343a40);
+      margin-top: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .container {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Disaster Preparedness Hub</h1>
+    <p>⚡ Learn, play, and test your knowledge to stay safe during disasters</p>
+  </section>
+
+  <!-- Section Title -->
+  <h2 class="section-title">Choose Your Activity</h2>
+
+  <!-- Cards Section -->
+  <div class="container">
+    <!-- Escape Room Card -->
+    <div class="card">
+      <img src="https://img.icons8.com/color/96/maze.png" alt="Game Icon">
+      <h2 style="color:#2a9d8f;">Escape Room Game</h2>
+      <p>Navigate the maze and answer questions to escape safely.</p>
+      <a href="escapeRoom.html" class="btn btn-game">Play Game</a>
+    </div>
+
+    <!-- Quiz Card -->
+    <div class="card">
+      <img src="https://img.icons8.com/color/96/quiz.png" alt="Quiz Icon">
+      <h2 style="color:#e76f51;">Disaster Quiz</h2>
+      <p>Test your disaster preparedness knowledge with fun quizzes.</p>
+      <a href="quiz.html" class="btn btn-quiz">Take Quiz</a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    SIH 2025 Project – Disaster Preparedness & Response Education System
+    <br>
+    <a href="login.html" style="color:#0077b6; font-weight:bold; text-decoration:none;">Logout</a>
+  </footer>
+
+</body>
+</html>

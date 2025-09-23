@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Awareness Maze Escape</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .game-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .canvas-wrapper { width: 100%; max-width: 640px; }
+        #gameCanvas {
+            border: 3px solid #333;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+            background: #f0f0f0;
+            width: 100%;
+            height: auto;
+            image-rendering: pixelated;
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .quiz-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .quiz-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .quiz-feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback-correct {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .feedback-incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .continue-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .continue-btn:hover {
+            background: #0056b3;
+        }
+
+        .timer-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            z-index: 100;
+        }
+
+        .timer-warning {
+            color: #ff4444 !important;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(150, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-modal {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .game-over-title {
+            font-size: 32px;
+            color: #dc3545;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .quiz-question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .quiz-option:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 150, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .victory-modal {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .victory-title {
+            font-size: 32px;
+            color: #4caf50;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            padding: 12px 30px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: #45a049;
+        }
+
+        /* Start Screen */
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1200;
+        }
+
+        .start-modal {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 720px;
+            width: 90%;
+            text-align: left;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+        }
+
+        .start-title {
+            font-size: 28px;
+            margin: 0 0 12px 0;
+            color: #333;
+        }
+
+        .start-list {
+            margin: 12px 0 0 18px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .start-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .primary-btn {
+            padding: 12px 22px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .primary-btn:hover { background: #1565c0; }
+
+        /* Fade helpers */
+        .fade-enter { opacity: 0; }
+        .fade-enter-active { opacity: 1; transition: opacity 250ms ease; }
+        .fade-exit { opacity: 1; }
+        .fade-exit-active { opacity: 0; transition: opacity 250ms ease; }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 100;
+        }
+        .lives { margin-bottom: 6px; }
+        .checkpoint-progress { margin-top: 4px; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title">🚨 Disaster Awareness Maze Escape 🚨</h1>
+        <div class="canvas-wrapper">
+            <canvas id="gameCanvas" width="600" height="480"></canvas>
+        </div>
+        <div class="controls">
+            Use W, A, S, D or Arrow Keys • Answer checkpoint quizzes • Reach the green exit!
+        </div>
+    </div>
+
+    <!-- Start Overlay -->
+    <div id="startOverlay" class="start-overlay">
+        <div class="start-modal">
+            <div class="start-title">How to Play</div>
+            <p>
+                You are a student navigating a school during a disaster drill. Find the exit by solving a random maze.
+                Checkpoints will quiz you on safety. Answer correctly to proceed. Wrong answers push you back.
+            </p>
+            <ul class="start-list">
+                <li>Move with W/A/S/D or Arrow Keys</li>
+                <li>Complete all checkpoint quizzes to unlock the exit</li>
+                <li>Wrong answers: go back 5 steps and -5s</li>
+                <li>Beat the clock before time runs out</li>
+            </ul>
+            <div class="start-actions">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <label><input type="radio" name="difficulty" value="Easy"> Easy (10x8, 3m)</label>
+                    <label><input type="radio" name="difficulty" value="Medium" checked> Medium (20x16, 2m)</label>
+                    <label><input type="radio" name="difficulty" value="Hard"> Hard (30x24, 1.5m)</label>
+                </div>
+                <button id="startGameBtn" class="primary-btn">Start Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Display -->
+    <div id="timerContainer" class="timer-container">
+        Time: <span id="timerDisplay">2:00</span>
+    </div>
+
+    <!-- HUD: Progress -->
+    <div id="hud" class="hud" style="display:none;">
+        <div class="checkpoint-progress">Checkpoints: <span id="progressDisplay">0</span> / <span id="progressTotal">0</span></div>
+    </div>
+
+    <!-- Quiz Overlay -->
+    <div id="quizOverlay" class="quiz-overlay">
+        <div class="quiz-modal">
+            <div id="quizQuestion" class="quiz-question"></div>
+            <div id="quizOptions" class="quiz-options"></div>
+            <div id="quizFeedback" class="quiz-feedback">
+                <div id="feedbackMessage"></div>
+                <button id="continueBtn" class="continue-btn">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameOverOverlay" class="game-over-overlay">
+        <div class="game-over-modal">
+            <div class="game-over-title">⏰ Time's Up! ⏰</div>
+            <p>You ran out of time! The disaster struck before you could escape safely.</p>
+            <p><strong>Remember:</strong> In real emergencies, quick thinking and preparation are crucial!</p>
+            <button class="restart-btn" onclick="game.restart()">Try Again</button>
+        </div>
+    </div>
+
+    <!-- Victory Overlay -->
+    <div id="victoryOverlay" class="victory-overlay">
+        <div class="victory-modal">
+            <div class="victory-title">🎉 You Escaped! 🎉</div>
+            <p>Congratulations! You've successfully navigated through the disaster awareness maze and learned valuable safety information!</p>
+            <button class="restart-btn" onclick="game.restart()">Play Again</button>
+        </div>
+    </div>
+
+    <script>    
+        // Game Configuration (dynamic by difficulty)
+        let CELL_SIZE = 30;
+        let MAZE_WIDTH = 20;
+        let MAZE_HEIGHT = 16;
+
+        // Game Colors
+        const COLORS = {
+            WALL: '#2c3e50',
+            PATH: '#ecf0f1',
+            PLAYER: '#e74c3c',
+            GOAL: '#27ae60',
+            CHECKPOINT: '#f39c12',
+            VISITED: '#bdc3c7'
+        };
+
+        // Quiz Questions for Disaster Awareness
+        const QUIZ_QUESTIONS = [
+            {
+                question: "What should you do first during an earthquake?",
+                options: ["Run outside immediately", "Drop, Cover, and Hold", "Stand in a doorway", "Call someone"],
+                correct: 1
+            },
+            {
+                question: "Which disaster is most common in coastal areas of India?",
+                options: ["Drought", "Cyclone", "Avalanche", "Volcanic eruption"],
+                correct: 1
+            },
+            {
+                question: "What should you include in an emergency kit?",
+                options: ["Only food", "Water, food, flashlight, first aid", "Just medicines", "Only important documents"],
+                correct: 1
+            },
+            {
+                question: "During a flood, you should:",
+                options: ["Drive through flooded roads", "Stay in high ground", "Go to the basement", "Ignore evacuation orders"],
+                correct: 1
+            },
+            {
+                question: "What does the orange alert in weather warnings mean?",
+                options: ["No danger", "Be aware", "Be prepared", "Take action"],
+                correct: 2
+            },
+            {
+                question: "In case of a fire emergency, you should:",
+                options: ["Use elevator to escape", "Stay low and crawl under smoke", "Open all windows", "Hide in bathroom"],
+                correct: 1
+            },
+            {
+                question: "The safest place during a thunderstorm is:",
+                options: ["Under a tree", "Inside a building", "In open field", "Near water"],
+                correct: 1
+            },
+            {
+                question: "Emergency contact number in India is:",
+                options: ["100", "101", "108", "112"],
+                correct: 3
+            }
+        ];
+
+        // Random perfect maze generator utilities
+        // 1 = wall, 0 = path, 2 = checkpoint, 3 = goal
+        function generatePerfectMaze(width, height) {
+            // Ensure odd dimensions for carving-by-2; clamp to given even grid by surrounding walls
+            const grid = Array.from({ length: height }, () => Array.from({ length: width }, () => 1));
+
+            const inBounds = (x, y) => x > 0 && x < width - 1 && y > 0 && y < height - 1;
+            const dirs = [ [0,-1], [1,0], [0,1], [-1,0] ];
+
+            // Start at (1,1)
+            const stack = [[1,1]];
+            grid[1][1] = 0;
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            // Carve passages using DFS backtracking, step by 2 to leave walls
+            while (stack.length) {
+                const [cx, cy] = stack[stack.length - 1];
+                const shuffled = shuffle(dirs.slice());
+                let carved = false;
+                for (const [dx, dy] of shuffled) {
+                    const nx = cx + dx * 2;
+                    const ny = cy + dy * 2;
+                    if (inBounds(nx, ny) && grid[ny][nx] === 1) {
+                        grid[cy + dy][cx + dx] = 0;
+                        grid[ny][nx] = 0;
+                        stack.push([nx, ny]);
+                        carved = true;
+                        break;
+                    }
+                }
+                if (!carved) stack.pop();
+            }
+
+            // Compute farthest reachable cell from start (ensures a valid goal)
+            const start = { x: 1, y: 1 };
+            const key = (x,y) => `${x},${y}`;
+            const prev = new Map();
+            const dist = new Map();
+            const queue = [[start.x, start.y]];
+            prev.set(key(start.x,start.y), null);
+            dist.set(key(start.x,start.y), 0);
+            let farthest = { x: start.x, y: start.y, d: 0 };
+            while (queue.length) {
+                const [x, y] = queue.shift();
+                const dcur = dist.get(key(x,y));
+                if (dcur > farthest.d) farthest = { x, y, d: dcur };
+                for (const [dx, dy] of dirs) {
+                    const nx = x + dx, ny = y + dy;
+                    if (inBounds(nx, ny) && grid[ny][nx] === 0 && !dist.has(key(nx,ny))) {
+                        dist.set(key(nx,ny), dcur + 1);
+                        prev.set(key(nx,ny), [x,y]);
+                        queue.push([nx, ny]);
+                    }
+                }
+            }
+
+            // Goal is the farthest cell
+            const goal = { x: farthest.x, y: farthest.y };
+
+            // Reconstruct solution path from start to goal
+            const path = [];
+            let cur = [goal.x, goal.y];
+            while (cur) {
+                path.push({ x: cur[0], y: cur[1] });
+                const p = prev.get(key(cur[0],cur[1]));
+                cur = p ? [p[0], p[1]] : null;
+            }
+            path.reverse();
+
+            // Place goal marker
+            grid[goal.y][goal.x] = 3;
+
+            // Place checkpoints spaced along the solution path (not at start or goal)
+            const checkpoints = [];
+            const numCheckpoints = Math.min(5, Math.max(2, Math.floor(path.length / 12)));
+            for (let i = 1; i <= numCheckpoints; i++) {
+                const idx = Math.floor((i * path.length) / (numCheckpoints + 1));
+                const { x, y } = path[idx];
+                // Avoid overlapping with start/goal
+                if ((x !== start.x || y !== start.y) && grid[y][x] !== 3) {
+                    grid[y][x] = 2;
+                    checkpoints.push({ x, y });
+                }
+            }
+
+            return { grid, start, goal, path, checkpoints };
+        }
+
+        // Difficulty presets
+        const DIFFICULTY = {
+            Easy: { width: 10, height: 8, time: 180 },
+            Medium: { width: 20, height: 16, time: 120 },
+            Hard: { width: 30, height: 24, time: 90 }
+        };
+
+        class MazeGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.quizOverlay = document.getElementById('quizOverlay');
+                this.victoryOverlay = document.getElementById('victoryOverlay');
+                this.gameOverOverlay = document.getElementById('gameOverOverlay');
+                this.timerDisplay = document.getElementById('timerDisplay');
+                this.hud = document.getElementById('hud');
+                this.progressDisplay = document.getElementById('progressDisplay');
+                this.progressTotal = document.getElementById('progressTotal');
+                this.quizFeedback = document.getElementById('quizFeedback');
+                this.feedbackMessage = document.getElementById('feedbackMessage');
+                this.continueBtn = document.getElementById('continueBtn');
+                this.startOverlay = document.getElementById('startOverlay');
+                this.startGameBtn = document.getElementById('startGameBtn');
+                
+                // Game state
+                this.player = { x: 1, y: 1 };
+                this.visitedCells = new Set();
+                this.checkpointsCompleted = new Set();
+                this.currentQuiz = null;
+                this.gameWon = false;
+                this.gameOver = false;
+                this.moveHistory = [];
+                this.gameStarted = false;
+                this.hints = [];
+                this.hasSkipQuiz = false;
+                this.revealHintActiveUntil = 0;
+                
+                // Timer state (more challenging)
+                this.totalTime = 120;
+                this.remainingTime = this.totalTime;
+                this.timerInterval = null;
+                this.isQuizActive = false;
+                
+                // Sound removed
+                
+                this.init();
+            }
+
+            init() {
+                this.generateNewMaze();
+                this.setupEventListeners();
+                this.gameLoop();
+            }
+
+            startGame() {
+                if (this.gameStarted) return;
+                this.gameStarted = true;
+                this.startOverlay.style.display = 'none';
+                this.updateTimerDisplay();
+                this.startTimer();
+                // background sound removed
+                this.hud.style.display = 'block';
+            }
+
+            generateNewMaze() {
+                const { grid, start, goal, path, checkpoints } = generatePerfectMaze(MAZE_WIDTH, MAZE_HEIGHT);
+                this.maze = grid;
+                this.start = start;
+                this.goal = goal;
+                this.solutionPath = path; // array of {x,y}
+                this.checkpointCells = new Set(checkpoints.map(c => `${c.x},${c.y}`));
+                this.wrongAttemptsByCheckpoint = new Map();
+                this.player = { x: start.x, y: start.y };
+                this.moveHistory = [ `${this.player.x},${this.player.y}` ];
+                this.visitedCells = new Set([ `${this.player.x},${this.player.y}` ]);
+                this.checkpointsCompleted.clear();
+                this.currentQuiz = null;
+                this.gameWon = false;
+                this.gameOver = false;
+                this.hasSkipQuiz = false;
+                this.spawnHints();
+                this.updateHud();
+            }
+
+            startTimer() {
+                this.updateTimerDisplay();
+                this.timerInterval = setInterval(() => {
+                    if (!this.isQuizActive && !this.gameWon && !this.gameOver) {
+                        this.remainingTime--;
+                        this.updateTimerDisplay();
+                        
+                        if (this.remainingTime <= 0) {
+                            this.endGame();
+                        }
+                    }
+                }, 1000);
+            }
+
+            updateTimerDisplay() {
+                const minutes = Math.floor(this.remainingTime / 60);
+                const seconds = this.remainingTime % 60;
+                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                this.timerDisplay.textContent = timeString;
+                
+                // Add warning animation when time is low
+                if (this.remainingTime <= 30) {
+                    this.timerDisplay.parentElement.classList.add('timer-warning');
+                } else {
+                    this.timerDisplay.parentElement.classList.remove('timer-warning');
+                }
+            }
+
+            endGame() {
+                this.gameOver = true;
+                clearInterval(this.timerInterval);
+                this.gameOverOverlay.style.display = 'flex';
+            }
+
+            setupEventListeners() {
+                // Keyboard controls
+                document.addEventListener('keydown', (e) => {
+                    if (!this.gameStarted || this.currentQuiz || this.gameWon || this.gameOver) return;
+                    
+                    const key = e.key.toLowerCase();
+                    let newX = this.player.x;
+                    let newY = this.player.y;
+                    
+                    switch(key) {
+                        case 'w':
+                        case 'arrowup':
+                            newY--; break;
+                        case 's':
+                        case 'arrowdown':
+                            newY++; break;
+                        case 'a':
+                        case 'arrowleft':
+                            newX--; break;
+                        case 'd':
+                        case 'arrowright':
+                            newX++; break;
+                        default: return;
+                    }
+                    
+                    e.preventDefault();
+                    this.movePlayer(newX, newY);
+                    // move sound removed
+                });
+
+                // Continue button in quiz
+                this.continueBtn.addEventListener('click', () => {
+                    this.hideQuizFeedback();
+                });
+
+                // Start button with inline difficulty selection
+                this.startGameBtn.addEventListener('click', () => {
+                    const selected = document.querySelector('input[name="difficulty"]:checked');
+                    const sel = selected ? selected.value : 'Medium';
+                    const preset = DIFFICULTY[sel];
+                    MAZE_WIDTH = preset.width;
+                    MAZE_HEIGHT = preset.height;
+                    this.totalTime = preset.time;
+                    this.remainingTime = this.totalTime;
+                    this.canvas.width = MAZE_WIDTH * CELL_SIZE;
+                    this.canvas.height = MAZE_HEIGHT * CELL_SIZE;
+                    this.generateNewMaze();
+                    this.updateTimerDisplay();
+                    this.startGame();
+                });
+            }
+
+            movePlayer(newX, newY) {
+                // Check bounds and walls
+                if (newX < 0 || newX >= MAZE_WIDTH || 
+                    newY < 0 || newY >= MAZE_HEIGHT ||
+                    this.maze[newY][newX] === 1) {
+                    return;
+                }
+
+                // Update player position
+                this.player.x = newX;
+                this.player.y = newY;
+                this.visitedCells.add(`${newX},${newY}`);
+                const posKey = `${newX},${newY}`;
+                const lastKey = this.moveHistory[this.moveHistory.length - 1];
+                if (posKey !== lastKey) this.moveHistory.push(posKey);
+
+                // Check for checkpoint
+                if (this.maze[newY][newX] === 2 && !this.checkpointsCompleted.has(`${newX},${newY}`)) {
+                    if (this.hasSkipQuiz) {
+                        this.hasSkipQuiz = false;
+                        this.checkpointsCompleted.add(`${newX},${newY}`);
+                        this.updateHud();
+                    } else {
+                        this.showQuiz(newX, newY);
+                    }
+                }
+
+                // Check for goal
+                if (this.maze[newY][newX] === 3) {
+                    // Only allow victory if all checkpoints completed
+                    if (this.checkpointsCompleted.size === this.checkpointCells.size) {
+                        this.showVictory();
+                    }
+                }
+
+                // Check for hint cell pick-up
+                const idx = this.hints.findIndex(h => h.x === newX && h.y === newY);
+                if (idx !== -1) {
+                    const hint = this.hints.splice(idx, 1)[0];
+                    this.applyHint(hint.type);
+                }
+            }
+
+            showQuiz(checkpointX, checkpointY) {
+                this.isQuizActive = true;
+                const randomQuestion = QUIZ_QUESTIONS[Math.floor(Math.random() * QUIZ_QUESTIONS.length)];
+                this.currentQuiz = { question: randomQuestion, checkpointX, checkpointY };
+                
+                document.getElementById('quizQuestion').textContent = randomQuestion.question;
+                
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = '';
+                
+                // Hide feedback initially
+                this.quizFeedback.style.display = 'none';
+                
+                randomQuestion.options.forEach((option, index) => {
+                    const optionButton = document.createElement('div');
+                    optionButton.className = 'quiz-option';
+                    optionButton.textContent = option;
+                    optionButton.onclick = () => this.handleQuizAnswer(index);
+                    optionsContainer.appendChild(optionButton);
+                });
+                
+                this.quizOverlay.style.display = 'flex';
+            }
+
+            handleQuizAnswer(selectedIndex) {
+                const isCorrect = selectedIndex === this.currentQuiz.question.correct;
+                
+                // Disable all option buttons
+                const options = document.querySelectorAll('.quiz-option');
+                options.forEach(option => {
+                    option.style.pointerEvents = 'none';
+                    option.style.opacity = '0.6';
+                });
+                
+                if (isCorrect) {
+                    this.showFeedback(true, "Correct! Well done! 🎉");
+                    // Mark checkpoint as completed
+                    this.checkpointsCompleted.add(`${this.currentQuiz.checkpointX},${this.currentQuiz.checkpointY}`);
+                    // Reset wrong-attempt counter for this checkpoint
+                    const ckey = `${this.currentQuiz.checkpointX},${this.currentQuiz.checkpointY}`;
+                    this.wrongAttemptsByCheckpoint.delete(ckey);
+                    this.updateHud();
+                } else {
+                    // Step-back penalty 5 steps and -5 seconds
+                    this.applyWrongAnswerPenalty();
+                    this.remainingTime = Math.max(0, this.remainingTime - 5);
+                    this.updateTimerDisplay();
+                    this.showFeedback(false, "Incorrect. Moving back 5 steps and -5s. 📚");
+                }
+            }
+
+            showFeedback(isCorrect, message) {
+                this.feedbackMessage.textContent = message;
+                this.quizFeedback.className = `quiz-feedback ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+                this.quizFeedback.style.display = 'block';
+                
+                // Store if answer was correct for later use
+                this.lastAnswerCorrect = isCorrect;
+            }
+
+            hideQuizFeedback() {
+                this.quizFeedback.style.display = 'none';
+                
+                // In lives system, no movement penalty here
+                
+                // Hide quiz overlay and reset game state
+                this.quizOverlay.style.display = 'none';
+                this.currentQuiz = null;
+                this.isQuizActive = false;
+                
+                // Re-enable option buttons for next quiz
+                const options = document.querySelectorAll('.quiz-option');
+                options.forEach(option => {
+                    option.style.pointerEvents = 'auto';
+                    option.style.opacity = '1';
+                });
+            }
+
+            applyWrongAnswerPenalty() {
+                // Move back exactly 5 steps along move history
+                let stepsToGo = 5;
+                while (stepsToGo > 0 && this.moveHistory.length > 1) {
+                    this.moveHistory.pop();
+                    stepsToGo--;
+                }
+                const last = this.moveHistory[this.moveHistory.length - 1].split(',');
+                this.player.x = parseInt(last[0]);
+                this.player.y = parseInt(last[1]);
+            }
+
+            showVictory() {
+                this.gameWon = true;
+                this.victoryOverlay.style.display = 'flex';
+                this.saveBestTime();
+            }
+
+            restart() {
+                clearInterval(this.timerInterval);
+                this.totalTime = 120;
+                this.remainingTime = this.totalTime;
+                this.victoryOverlay.style.display = 'none';
+                this.gameOverOverlay.style.display = 'none';
+                this.generateNewMaze();
+                this.updateTimerDisplay();
+                this.timerInterval = null;
+                this.gameStarted = false;
+                this.startOverlay.style.display = 'flex';
+                // background sound removed
+                this.hud.style.display = 'none';
+            }
+
+            render() {
+                // Clear canvas
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw maze
+                for (let y = 0; y < MAZE_HEIGHT; y++) {
+                    for (let x = 0; x < MAZE_WIDTH; x++) {
+                        const cellType = this.maze[y][x];
+                        const posX = x * CELL_SIZE;
+                        const posY = y * CELL_SIZE;
+                        
+                        // Draw cell background
+                        if (cellType === 1) {
+                            this.ctx.fillStyle = COLORS.WALL;
+                        } else if (cellType === 3) {
+                            this.ctx.fillStyle = COLORS.GOAL;
+                        } else if (cellType === 2) {
+                            if (this.checkpointsCompleted.has(`${x},${y}`)) {
+                                this.ctx.fillStyle = COLORS.VISITED;
+                            } else {
+                                this.ctx.fillStyle = COLORS.CHECKPOINT;
+                            }
+                        } else {
+                            if (this.visitedCells.has(`${x},${y}`)) {
+                                this.ctx.fillStyle = COLORS.VISITED;
+                            } else {
+                                this.ctx.fillStyle = COLORS.PATH;
+                            }
+                        }
+                        
+                        this.ctx.fillRect(posX, posY, CELL_SIZE, CELL_SIZE);
+                        
+                        // Draw cell borders
+                        this.ctx.strokeStyle = '#34495e';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.strokeRect(posX, posY, CELL_SIZE, CELL_SIZE);
+                        
+                        // Draw special cell indicators
+                        if (cellType === 2 && !this.checkpointsCompleted.has(`${x},${y}`)) {
+                            this.ctx.fillStyle = '#fff';
+                            this.ctx.font = '20px Arial';
+                            this.ctx.textAlign = 'center';
+                            this.ctx.fillText('?', posX + CELL_SIZE/2, posY + CELL_SIZE/2 + 7);
+                        }
+                        
+                        if (cellType === 3) {
+                            this.ctx.fillStyle = '#fff';
+                            this.ctx.font = '16px Arial';
+                            this.ctx.textAlign = 'center';
+                            this.ctx.fillText('EXIT', posX + CELL_SIZE/2, posY + CELL_SIZE/2 + 5);
+                        }
+                    }
+                }
+                
+                // Draw player as a simple student avatar (head + body) with smooth movement
+                if (!this.anim) this.anim = { x: this.player.x, y: this.player.y };
+                const lerp = (a,b,t)=> a + (b-a)*t;
+                const speed = 0.25;
+                this.anim.x = lerp(this.anim.x, this.player.x, speed);
+                this.anim.y = lerp(this.anim.y, this.player.y, speed);
+                const playerX = this.anim.x * CELL_SIZE + CELL_SIZE/2;
+                const playerY = this.anim.y * CELL_SIZE + CELL_SIZE/2;
+
+                // Body
+                this.ctx.fillStyle = '#1976d2';
+                this.ctx.fillRect(playerX - 8, playerY - 2, 16, 16);
+
+                // Head
+                this.ctx.fillStyle = '#ffcc80';
+                this.ctx.beginPath();
+                this.ctx.arc(playerX, playerY - 10, 9, 0, Math.PI * 2);
+                this.ctx.fill();
+
+                // Backpack
+                this.ctx.fillStyle = '#2e7d32';
+                this.ctx.fillRect(playerX + 6, playerY - 2, 6, 12);
+
+                // Draw hint cells (⭐)
+                this.ctx.fillStyle = '#ffd54f';
+                this.ctx.font = '18px Arial';
+                this.ctx.textAlign = 'center';
+                for (const h of (this.hints || [])) {
+                    const hx = h.x * CELL_SIZE + CELL_SIZE/2;
+                    const hy = h.y * CELL_SIZE + CELL_SIZE/2 + 6;
+                    this.ctx.fillText('⭐', hx, hy);
+                }
+            }
+
+            gameLoop() {
+                this.render();
+                requestAnimationFrame(() => this.gameLoop());
+            }
+        }
+
+        // Extra methods injected after class definition via prototype to keep patch smaller
+        MazeGame.prototype.updateHud = function() {
+            this.progressDisplay.textContent = `${this.checkpointsCompleted.size}`;
+            this.progressTotal.textContent = `${this.checkpointCells.size}`;
+        };
+
+        MazeGame.prototype.spawnHints = function() {
+            this.hints = [];
+            const count = Math.floor(Math.random() * 2) + 1;
+            let attempts = 0;
+            while (this.hints.length < count && attempts < 200) {
+                attempts++;
+                const x = Math.floor(Math.random() * MAZE_WIDTH);
+                const y = Math.floor(Math.random() * MAZE_HEIGHT);
+                if (this.maze[y][x] !== 0) continue;
+                if (x === this.start.x && y === this.start.y) continue;
+                if (x === this.goal.x && y === this.goal.y) continue;
+                if (this.checkpointCells.has(`${x},${y}`)) continue;
+                if (this.hints.some(h => h.x === x && h.y === y)) continue;
+                const types = ['reveal','time','skip'];
+                const type = types[Math.floor(Math.random()*types.length)];
+                this.hints.push({ x, y, type });
+            }
+        };
+
+        MazeGame.prototype.applyHint = function(type) {
+            if (type === 'reveal') {
+                this.revealHintActiveUntil = performance.now() + 5000;
+            } else if (type === 'time') {
+                this.remainingTime = Math.min(this.totalTime, this.remainingTime + 10);
+                this.updateTimerDisplay();
+            } else if (type === 'skip') {
+                this.hasSkipQuiz = true;
+            }
+        };
+
+        // Inline difficulty selection handled on Start button; dialog removed
+
+        MazeGame.prototype.saveBestTime = function() {
+            const diff = Object.keys(DIFFICULTY).find(k => DIFFICULTY[k].time === this.totalTime && DIFFICULTY[k].width === MAZE_WIDTH);
+            const elapsed = this.totalTime - this.remainingTime;
+            const key = `maze_best_${diff || 'Medium'}`;
+            const current = parseInt(localStorage.getItem(key) || '999999', 10);
+            if (elapsed < current) {
+                localStorage.setItem(key, String(elapsed));
+            }
+            // Leaderboard display
+            const modal = document.querySelector('#victoryOverlay .victory-modal');
+            const old = modal.querySelector('.best-times');
+            if (old) old.remove();
+            const list = document.createElement('div');
+            list.className = 'best-times';
+            list.style.marginTop = '10px';
+            const items = Object.keys(DIFFICULTY).map(k => {
+                const t = parseInt(localStorage.getItem(`maze_best_${k}`) || '0', 10);
+                const mm = t > 0 ? Math.floor(t / 60) : 0;
+                const ss = t > 0 ? (t % 60) : 0;
+                return `${k}: ${mm}:${ss.toString().padStart(2,'0')}`;
+            }).join(' | ');
+            list.textContent = `Best Times → ${items}`;
+            modal.appendChild(list);
+        };
+
+        // Initialize game when page loads
+        let game;
+        window.addEventListener('load', () => {
+            game = new MazeGame();
+        });
+
+        // Audio removed
+    </script>
+</body>
+</html>
