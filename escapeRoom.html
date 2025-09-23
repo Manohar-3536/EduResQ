@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Disaster Awareness Maze Escape</title>
+    <link rel="icon" href="images/shield-check.svg" type="image/svg+xml">
     <style>
         body {
             margin: 0;
@@ -286,6 +287,32 @@
 
         .primary-btn:hover { background: #1565c0; }
 
+        /* Secondary button */
+        .secondary-btn {
+            padding: 12px 22px;
+            background: #9e9e9e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .secondary-btn:hover { background: #757575; }
+
+        /* Exit button for in-game HUD */
+        .exit-btn {
+            margin-top: 8px;
+            padding: 8px 14px;
+            background: #e53935;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .exit-btn:hover { background: #c62828; }
+
         /* Fade helpers */
         .fade-enter { opacity: 0; }
         .fade-enter-active { opacity: 1; transition: opacity 250ms ease; }
@@ -336,11 +363,12 @@
             </ul>
             <div class="start-actions">
                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-                    <label><input type="radio" name="difficulty" value="Easy"> Easy (10x8, 3m)</label>
-                    <label><input type="radio" name="difficulty" value="Medium" checked> Medium (20x16, 2m)</label>
+                    <!-- <label><input type="radio" name="difficulty" value="Easy"> Easy (10x8, 3m)</label> -->
+                    <label><input type="radio" name="difficulty" value="Easy" checked> Easy (20x16, 2m)</label>
                     <label><input type="radio" name="difficulty" value="Hard"> Hard (30x24, 1.5m)</label>
                 </div>
                 <button id="startGameBtn" class="primary-btn">Start Game</button>
+                <button id="startExitBtn" class="secondary-btn">Exit</button>
             </div>
         </div>
     </div>
@@ -353,6 +381,7 @@
     <!-- HUD: Progress -->
     <div id="hud" class="hud" style="display:none;">
         <div class="checkpoint-progress">Checkpoints: <span id="progressDisplay">0</span> / <span id="progressTotal">0</span></div>
+        <button id="exitGameBtn" class="exit-btn">Exit</button>
     </div>
 
     <!-- Quiz Overlay -->
@@ -543,8 +572,8 @@
 
         // Difficulty presets
         const DIFFICULTY = {
-            Easy: { width: 10, height: 8, time: 180 },
-            Medium: { width: 20, height: 16, time: 120 },
+            // Easy: { width: 10, height: 8, time: 180 },
+            Easy: { width: 20, height: 16, time: 120 },
             Hard: { width: 30, height: 24, time: 90 }
         };
 
@@ -698,7 +727,7 @@
                 // Start button with inline difficulty selection
                 this.startGameBtn.addEventListener('click', () => {
                     const selected = document.querySelector('input[name="difficulty"]:checked');
-                    const sel = selected ? selected.value : 'Medium';
+                    const sel = selected ? selected.value : 'Easy';
                     const preset = DIFFICULTY[sel];
                     MAZE_WIDTH = preset.width;
                     MAZE_HEIGHT = preset.height;
@@ -710,6 +739,20 @@
                     this.updateTimerDisplay();
                     this.startGame();
                 });
+
+                // Exit buttons -> navigate to learning hub
+                const startExitBtn = document.getElementById('startExitBtn');
+                if (startExitBtn) {
+                    startExitBtn.addEventListener('click', () => {
+                        window.location.href = 'learningHub.html';
+                    });
+                }
+                const exitGameBtn = document.getElementById('exitGameBtn');
+                if (exitGameBtn) {
+                    exitGameBtn.addEventListener('click', () => {
+                        window.location.href = 'learningHub.html';
+                    });
+                }
             }
 
             movePlayer(newX, newY) {
@@ -1001,7 +1044,7 @@
         MazeGame.prototype.saveBestTime = function() {
             const diff = Object.keys(DIFFICULTY).find(k => DIFFICULTY[k].time === this.totalTime && DIFFICULTY[k].width === MAZE_WIDTH);
             const elapsed = this.totalTime - this.remainingTime;
-            const key = `maze_best_${diff || 'Medium'}`;
+            const key = `maze_best_${diff || 'Easy'}`;
             const current = parseInt(localStorage.getItem(key) || '999999', 10);
             if (elapsed < current) {
                 localStorage.setItem(key, String(elapsed));
